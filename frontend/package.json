@@ -29,9 +29,6 @@
       "not dead",
       "not op_mini all"
     ],
-  "jest" : {
-    "resetMocks": false
-  },
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
