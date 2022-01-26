@@ -7,8 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Data
+
 @Entity
+@Data
 public class User {
 
     @Id
@@ -19,6 +20,5 @@ public class User {
 
     private String displayName;
 
-    private String password;
-
+    public String password;
 }

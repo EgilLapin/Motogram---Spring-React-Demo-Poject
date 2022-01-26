@@ -1,5 +1,5 @@
 import React from 'React';
-import {render, cleanup, fireEvent, queryByPlaceholderText} from '@testing-library/react';
+import {render, cleanup, fireEvent, waitForDomChange} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {UserSignupPage} from './UserSignupPage';
 
@@ -55,6 +55,16 @@ describe('UserSignupPage', () => {
             }
         };
     };
+
+    const mockAsyncDelayed = () => {
+        return jest.fn().mockImplementation(() => {
+            return new Promise((resolce,reject)=>{
+                setTimeout(() => {
+                    resolve({});
+                }, 300)
+            })
+    })
+    }
 
     let button, displayNameInput,usernameInput,passwordInput, passwordRepeat;
 
@@ -128,5 +138,26 @@ describe('UserSignupPage', () => {
             };
             expect(actions.postSignup).toHaveBeenCalledWith(expectedUserObject);
         });
+        it('does not allow to click signup button when there is ongoing API call',() =>{
+            const actions = {
+                postSignup : mockAsyncDelayed()
+        };
+            setupForSubmit({actions})
+            fireEvent.click(button);
+            fireEvent.click(button);
+        
+            expect(actions.postSignup).toHaveBeenCalledTimes(1);
+        });
+        it('display spinner when there is ongoing API call',() =>{
+            const actions = {
+                postSignup : mockAsyncDelayed()
+        };
+           const {queryByText} = setupForSubmit({actions});
+           fireEvent.click(button);
+
+           const spinner = queryByText('Loading...');
+           expect(spinner).toBeInTheDocument();
+        });
+       
     });
 });
