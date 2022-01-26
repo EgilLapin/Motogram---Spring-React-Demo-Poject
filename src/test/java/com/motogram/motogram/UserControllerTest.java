@@ -1,5 +1,6 @@
 package com.motogram.motogram;
 
+import com.motogram.motogram.error.ApiError;
 import com.motogram.motogram.shared.GenericResponse;
 import com.motogram.motogram.user.User;
 import com.motogram.motogram.user.UserRepository;
@@ -32,7 +33,7 @@ public class UserControllerTest {
     @Autowired
     UserRepository userRepository;
 
-    public static final String API_1_0_USERS = "/api/1.0/users";
+    public static final String API_1_0_USERS = "/api/1.0/users/";
 
     private User createValidUser() {
         User user = new User();
@@ -174,6 +175,23 @@ public class UserControllerTest {
         user.setPassword("123456789");
         ResponseEntity<Object> response = postSignup(user,Object.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void postUser_whenUserisInvalid_receiveApiError(){
+        User user = createValidUser();
+        user.setPassword(null);;
+        ResponseEntity<ApiError> response = postSignup(user,ApiError.class);
+        assertThat(response.getBody().getUrl()).isEqualTo(API_1_0_USERS);
+    }
+    @Test
+    public void postUser_whenUserisInvalid_receiveApiErrorWithValidationErrors() {
+        User user = createValidUser();
+        user.setUsername("123");
+        user.setPassword(null);
+        user.setDisplayName(null);
+        ResponseEntity<ApiError> response = postSignup(user, ApiError.class);
+        assertThat(response.getBody().getValidationErrors().size()).isEqualTo(3);
     }
 
     public <T> ResponseEntity<T> postSignup(Object request, Class<T> response){
