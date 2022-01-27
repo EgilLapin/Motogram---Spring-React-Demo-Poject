@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/api/1.0/users/")
+    @PostMapping("/api/1.0/users")
     GenericResponse createUser(@Valid @RequestBody User user){
         userService.save(user);
         return new GenericResponse("User Saved");
