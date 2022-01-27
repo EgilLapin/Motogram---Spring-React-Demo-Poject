@@ -1,9 +1,6 @@
 import React from 'React';
-import {render, cleanup, fireEvent, waitForDomChange} from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import {render, fireEvent, waitForElement} from '@testing-library/react';
 import {UserSignupPage} from './UserSignupPage';
-
-beforeEach(cleanup);
 
 describe('UserSignupPage', () => {
     describe('Layout',()=> {
@@ -158,7 +155,36 @@ describe('UserSignupPage', () => {
            const spinner = queryByText('Loading...');
            expect(spinner).toBeInTheDocument();
         });
-        
+
+        it('enables the signup button when password and repeat password are same value',() =>{
+          setupForSubmit();
+          expect(button).not.toBeDisabled();
+        });
+
+        it('disables the signup button when password and repeat password are not same value',() =>{
+            setupForSubmit();
+            fireEvent.change(passwordRepeat,changeEvent('new-pass'));
+            expect(button).toBeDisabled();
+          });
+
+          it('disables the signup button when password repeat does not match password',() =>{
+            setupForSubmit();
+            fireEvent.change(passwordRepeat,changeEvent('new-pass'));
+            expect(button).toBeDisabled();
+          });
+
+          it('disables the signup button when password does not match password repeat',() =>{
+            setupForSubmit();
+            fireEvent.change(passwordInput,changeEvent('new-pass'));
+            expect(button).toBeDisabled();
+          });
+
+          it('displays error style for password repeat input when password repeat mismatch',() =>{
+            const {queryByText} = setupForSubmit();
+            fireEvent.change(passwordRepeat,changeEvent('new-pass'));
+            const mismatchWarning = queryByText('Does not match to password');
+            expect(mismatchWarning).toBeInTheDocument();
+          });
        
     });
 });
